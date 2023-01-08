@@ -10,10 +10,6 @@ import {DictionaryManagerCtx} from "../../stores/DictionaryManagerCtx";
 import {IRouteData} from "../../interfaces/IRouteData";
 import { MainPlannerBase } from "./MainPlannerBase";
 import { DictionaryStoreCtx } from "../../stores/DictionaryStoreCtx";
-import {CustomerStore} from "../../stores/CustomerStore";
-import { CustomerStoreCtx } from "../../stores/CustomerStoreCtx";
-import { MandateStoreCtx } from "../../stores/MandateStoreCtx";
-import {MandateStore} from "../../stores/MandateStore";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import {ExerciseStoreCtx} from "../../stores/ExerciseStoreCtx";
@@ -48,7 +44,6 @@ export const MainPlannerContextBase = observer(function (props: PropTy) {
     const dictionaryManager = React.useContext(DictionaryManagerCtx);
 
     const dictionaryStore = React.useMemo(() => dictionaryManager.addDictionaryGroup('planner'), [dictionaryManager]);
-    const customerStore = React.useRef(new CustomerStore(connectorRef.current));
     const exerciseStore = React.useRef(new ExerciseStore(connectorRef.current));
 
     React.useEffect(() => {
@@ -64,11 +59,9 @@ export const MainPlannerContextBase = observer(function (props: PropTy) {
     return <>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DictionaryStoreCtx.Provider value={dictionaryStore}>
-            <CustomerStoreCtx.Provider value ={customerStore.current}>
-                <ExerciseStoreCtx.Provider value ={exerciseStore.current}>
-                    {<MainPlannerBase {...restProps}/>}
-                </ExerciseStoreCtx.Provider>
-            </CustomerStoreCtx.Provider>
+            <ExerciseStoreCtx.Provider value ={exerciseStore.current}>
+                {<MainPlannerBase {...restProps}/>}
+            </ExerciseStoreCtx.Provider>
         </DictionaryStoreCtx.Provider>
         </LocalizationProvider>
     </>;

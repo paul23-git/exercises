@@ -5,12 +5,14 @@ import {ISavableStore} from "../interfaces/ISavableStore";
 import {action, computed, makeObservable, observable} from "mobx";
 import {DataObject} from "./DataObject";
 import {HTTPStatusError} from "../errors";
-import {IContactPersonData} from "../interfaces/ICustomer";
 import {IPlayer, IPlayerData} from "../interfaces/IPlayer";
 import {Player} from "./Player";
+import {Field} from "./Field";
+import {IField} from "../interfaces/IField";
 
 export class Exercise extends SavableDataObjectModel implements IExercise, IIDable {
     private readonly _players: Map<string|number, IPlayer>;
+    private readonly _field: Field;
     get players(): Map<string|number, IPlayer> {
         return this._players;
     }
@@ -23,9 +25,14 @@ export class Exercise extends SavableDataObjectModel implements IExercise, IIDab
         this.setData('name', value);
     }
 
+    get field(): IField {
+        return this._field;
+    }
+
     constructor(data: IExerciseData) {
         super(data);
         this._players = new Map();
+        this._field = new Field(data.field);
         for (const [id, p] of data.players) {
             this._players.set(id, new Player(p));
         }
@@ -33,10 +40,11 @@ export class Exercise extends SavableDataObjectModel implements IExercise, IIDab
             return [k, new DataObject(v)];
         }));
 
-
-        makeObservable<Exercise, '_players'>(this, {
+        makeObservable<Exercise, '_players' | '_field'>(this, {
             dataInternal: observable,
             _players: observable,
+            _field: observable,
+            field: computed,
             players: computed,
             name: computed,
         });
@@ -45,10 +53,17 @@ export class Exercise extends SavableDataObjectModel implements IExercise, IIDab
     addPlayer(player: IPlayer) {
         this._players.set(player.id, player);
     }
+    removePlayer(id: string|number) {
+        this._players.delete(id);
+    }
+    getPlayer(id: string|number) {
+        return this._players.get(id);
+    }
 
-    async requestSaveMe(mandateStore: ISavableStore, fieldname: string): Promise<void> {
+
+    async requestSaveMe(exerciseStore: ISavableStore, fieldname: string): Promise<void> {
         try {
-            await mandateStore.saveData(this, fieldname);
+            await exerciseStore.saveData(this, fieldname);
             this.markSaved(fieldname);
         } catch (err) {
             if (err instanceof HTTPStatusError) {
@@ -66,10 +81,12 @@ export class Exercise extends SavableDataObjectModel implements IExercise, IIDab
             const newp = Player.buildData(p)
             playerMap.set(newp.id, newp);
         }
+        const field = Field.buildData(dat.field);
         return {
             name: dat.name,
             id: dat.id,
             players: playerMap,
+            field: field,
         }
     }
 
@@ -95,5 +112,4 @@ export class Exercise extends SavableDataObjectModel implements IExercise, IIDab
         }
 
     }
-
 }

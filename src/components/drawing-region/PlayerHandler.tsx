@@ -17,20 +17,29 @@ type PropTy = {
 
 export const PlayerHandler = observer(function (props: PropTy) {
     const {player} = props;
-    const {canvasScale, maxHeight, maxWidth} = React.useContext(FieldCtx);
+    const {canvasScale, maxHeight, maxWidth, action, setDetailView, detailView} = React.useContext(FieldCtx);
+
 
     function onDragEnd(e: Konva.KonvaEventObject<DragEvent>) {
         player.x = clamp(0, maxWidth, e.target.x());
         player.y = clamp(0, maxHeight, e.target.y());
     }
+    function onClick(e: Konva.KonvaEventObject<MouseEvent>) {
+
+        if (action==='pointer' && (detailView[0] !== 'player' || detailView[1] !== player.id)) {
+            setDetailView(['player', player.id]);
+        }
+    }
     return <>
         <Player
-            x={player.x}
-            y={player.y}
+            x={Number(player.x)}
+            y={Number(player.y)}
             teamcolor={player.teamcolor}
             label={player.label}
             canvasScale={canvasScale}
             onDragEnd={onDragEnd}
+            onClick={onClick}
+            action={action}
         />
     </>
 });

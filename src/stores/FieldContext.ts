@@ -6,10 +6,20 @@ export type ContextType = {
     maxHeight: number,
     canvasScale: number,
     action: ActionType,
+    setAction: (newkey: ActionType) => void,
+    additionKey: string|null,
+    setAdditionKey: (newkey: string|null) => void,
+    setDetailView: (newView: [string|number|null, string|number|null]) => void,
+    detailView: [string|number|null, string|number|null],
 }
 export const FieldCtx = React.createContext<ContextType>({
     maxWidth: 0,
     maxHeight: 0,
     canvasScale: 1,
     action:"pointer",
+    additionKey: null,
+    setAdditionKey: () => {},
+    setAction: () => {},
+    detailView: ['overview', null],
+    setDetailView: () => {},
 })

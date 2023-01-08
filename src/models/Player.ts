@@ -5,6 +5,7 @@ import {action, computed, makeObservable, observable} from "mobx";
 import {DataObject} from "./DataObject";
 import {HTTPStatusError} from "../errors";
 import {IPlayer, IPlayerData} from "../interfaces/IPlayer";
+import {ExerciseStore} from "../stores/ExerciseStore";
 
 export class Player extends SavableDataObjectModel implements IPlayer, IIDable {
     get x(): number  {
@@ -55,13 +56,14 @@ export class Player extends SavableDataObjectModel implements IPlayer, IIDable {
         });
     }
 
-    async requestSaveMe(mandateStore: ISavableStore, fieldname: string): Promise<void> {
+    async requestSaveMe(exerciseStore: ExerciseStore, fieldname: string): Promise<void> {
         try {
-            await mandateStore.saveData(this, fieldname);
+            await exerciseStore.savePlayerData(this, fieldname);
             this.markSaved(fieldname);
         } catch (err) {
             if (err instanceof HTTPStatusError) {
                 this.markSaveError(fieldname, err);
+                throw err;
             } else {
                 throw err;
             }

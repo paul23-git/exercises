@@ -18,6 +18,7 @@ export type PlayerCreateType = {
 export class ExerciseStore implements ISavableStore {
     static exerciseUrl: string = '/exercise/';
     static playerUrl: string = '/player/';
+    static fieldUrl: string = '/exercise/field/';
     conn: FetcherBase;
     exercises: Map<number|string, Exercise>;
     handleDataSaveError(err: Error, what: string): void {
@@ -36,11 +37,18 @@ export class ExerciseStore implements ISavableStore {
                 id: id,
                 name: 'test',
                 players: [{
+                    id: 1,
                     x: 100,
                     y: 100,
                     teamcolor: "red",
                     label: "A2",
-                }]
+                }],
+                field: {
+                    id: 1,
+                    width: (55+2*2),
+                    height: (91.4+2*6),
+                    backgroundColor: "green",
+                }
             }
             const newE = Exercise.buildExercise(dat);
             this.exercises.set(newE.id, newE);
@@ -103,7 +111,7 @@ export class ExerciseStore implements ISavableStore {
         this.exercises.set(exercise.id, exercise);
     }
     _addPlayer(exercise: IExercise, player: Player) {
-        exercise.addPLayer(player);
+        exercise.addPlayer(player);
     }
 
     async saveDataRaw(id: string|number, fieldname: string, data: IDataObject<any>): Promise<void> {
@@ -138,12 +146,31 @@ export class ExerciseStore implements ISavableStore {
             })
         }
     }
+    async saveFieldDataRaw(id: string|number, fieldname: string, data: IDataObject<any>): Promise<void> {
+        //const v = dataObject.getData(fieldname);
+        if (data.changed && data.old !== data.current) {
+            let val = data.saveFun ? data.saveFun() : data.current;
+            if (nullOrUndefined(val)) {
+                val = '';
+            }
+            await this.conn.fetchData(BASE_URL + ExerciseStore.fieldUrl + id + '/' + fieldname, {
+                method: 'POST',
+                body: {
+                    id: id.toString(),
+                    value: val,
+                }
+            })
+        }
+    }
 
     async saveData(dataObject: ISavable, fieldname: string): Promise<void> {
         await this.saveDataRaw(dataObject.id, fieldname, dataObject.getDataRaw(fieldname));
     }
     async savePlayerData(dataObject: ISavable, fieldname: string): Promise<void> {
         await this.savePlayerDataRaw(dataObject.id, fieldname, dataObject.getDataRaw(fieldname));
+    }
+    async saveFieldData(dataObject: ISavable, fieldname: string): Promise<void> {
+        await this.saveFieldDataRaw(dataObject.id, fieldname, dataObject.getDataRaw(fieldname));
     }
 
 }

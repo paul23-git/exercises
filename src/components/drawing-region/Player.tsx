@@ -4,6 +4,7 @@ import {DictionaryStoreCtx} from "../../stores/DictionaryStoreCtx";
 import {LanguageCtx} from "../../stores/LanguageCtx";
 import {Circle, Group, Text} from "react-konva";
 import Konva from "konva";
+import {FieldCtx} from "../../stores/FieldContext";
 
 
 type PropTy = {
@@ -12,19 +13,23 @@ type PropTy = {
     canvasScale: number;
     teamcolor: string;
     label: string;
-    onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void
+    onDragEnd?: (evt: Konva.KonvaEventObject<DragEvent>) => void,
+    onClick?: (evt: Konva.KonvaEventObject<MouseEvent>) => void,
+    action: string,
 }
 
 export const Player = observer(function (props: PropTy) {
-    const {canvasScale:S, x, y, teamcolor, label, onDragEnd} = props;
+    const {canvasScale:S, x, y, teamcolor, label, onDragEnd, onClick, action} = props;
     const dictionaryStore = React.useContext(DictionaryStoreCtx);
     const [language,] = React.useContext(LanguageCtx);
     const radiusBase = 8
     const r = S < 0.75 ? 0.75*radiusBase/S : radiusBase;
     const textScale = S < 2/3 ? 2/3*1/S : 1;
+
     return <Group
-        draggable={!!onDragEnd}
+        draggable={action === "pointer" && !!onDragEnd}
         onDragEnd={onDragEnd}
+        onClick={onClick}
         x={x}
         y={y}
     >

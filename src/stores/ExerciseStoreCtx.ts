@@ -1,5 +1,4 @@
 import {FetcherUrl} from "../Fetchers/FetcherUrl";
-import {MandateStore} from "./MandateStore";
 import * as React from "react";
 import {ExerciseStore} from "./ExerciseStore";
 

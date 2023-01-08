@@ -5,8 +5,6 @@ import {observer} from 'mobx-react-lite';
 import { DictionaryManagerCtx } from '../../stores/DictionaryManagerCtx';
 import {LanguageRouter} from "./LanguageRouter";
 import {CssBaseline} from "@mui/material";
-import {Field} from "../drawing-region/Field";
-import {FieldSizer} from "../drawing-region/FieldSizer";
 
 
 export const Main = observer(function Main() {
